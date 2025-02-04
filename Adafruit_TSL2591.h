@@ -48,6 +48,9 @@
 #define TSL2591_ENABLE_AIEN                                                    \
   (0x10) ///< ALS Interrupt Enable. When asserted permits ALS interrupts to be
          ///< generated, subject to the persist filter.
+#define TSL2591_ENABLE_SAI                                                     \
+  (0x40) ///< Sleep after interrupt. When asserted, the device will power down at
+         ///< the end of an ALS cycle if an interrupt has been generated.
 #define TSL2591_ENABLE_NPIEN                                                   \
   (0x80) ///< No Persist Interrupt Enable. When asserted NP Threshold conditions
          ///< will generate an interrupt, bypassing the persist filter
@@ -137,6 +140,8 @@ public:
   boolean begin(uint8_t addr = TSL2591_ADDR);
   void enable(void);
   void disable(void);
+  void enableI2C(void);
+  void disableI2C(void);
 
   float calculateLux(uint16_t ch0, uint16_t ch1);
   void setGain(tsl2591Gain_t gain);

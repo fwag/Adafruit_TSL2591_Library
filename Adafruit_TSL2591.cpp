@@ -135,7 +135,7 @@ void Adafruit_TSL2591::enable(void) {
   // Enable the device by setting the control bit to 0x01
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
          TSL2591_ENABLE_POWERON | TSL2591_ENABLE_AEN | TSL2591_ENABLE_AIEN |
-             TSL2591_ENABLE_NPIEN);
+             TSL2591_ENABLE_SAI);// | TSL2591_ENABLE_NPIEN);
 }
 
 /**************************************************************************/
@@ -143,7 +143,30 @@ void Adafruit_TSL2591::enable(void) {
     @brief Disables the chip, so it's in power down mode
 */
 /**************************************************************************/
-void Adafruit_TSL2591::disable(void) {
+void Adafruit_TSL2591::enableI2C(void) 
+{
+  /*if (!i2c_dev) {
+    i2c_dev = new Adafruit_I2CDevice(TSL2591_ADDR, &Wire);
+  }*/
+
+  if (i2c_dev)
+    i2c_dev->begin();
+
+}
+
+void Adafruit_TSL2591::disableI2C(void) { 
+  if (i2c_dev) {
+    i2c_dev->end();
+    //delete i2c_dev;
+  }
+  
+  /*digitalWrite(PIN_WIRE_SDA, HIGH);
+  digitalWrite(PIN_WIRE_SCL, HIGH);
+  pinMode(PIN_WIRE_SDA, INPUT);
+  pinMode(PIN_WIRE_SCL, INPUT);*/    
+}
+
+void Adafruit_TSL2591::disable(void) { 
   if (!_initialized) {
     if (!begin()) {
       return;
@@ -168,10 +191,10 @@ void Adafruit_TSL2591::setGain(tsl2591Gain_t gain) {
     }
   }
 
-  enable();
+  //enable();
   _gain = gain;
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_CONTROL, _integration | _gain);
-  disable();
+  //disable();
 }
 
 /************************************************************************/
@@ -195,10 +218,10 @@ void Adafruit_TSL2591::setTiming(tsl2591IntegrationTime_t integration) {
     }
   }
 
-  enable();
+  //enable();
   _integration = integration;
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_CONTROL, _integration | _gain);
-  disable();
+  //disable();
 }
 
 /************************************************************************/
@@ -305,7 +328,7 @@ uint32_t Adafruit_TSL2591::getFullLuminosity(void) {
   }
 
   // Enable the device
-  enable();
+  //enable();
 
   // Wait x ms for ADC to complete
   for (uint8_t d = 0; d <= _integration; d++) {
@@ -321,7 +344,7 @@ uint32_t Adafruit_TSL2591::getFullLuminosity(void) {
   x <<= 16;
   x |= y;
 
-  disable();
+  //disable();
 
   return x;
 }
@@ -372,7 +395,7 @@ void Adafruit_TSL2591::registerInterrupt(
     }
   }
 
-  enable();
+  //enable();
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_PERSIST_FILTER, persist);
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_AILTL,
          lowerThreshold);
@@ -382,7 +405,7 @@ void Adafruit_TSL2591::registerInterrupt(
          upperThreshold);
   write8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_THRESHOLD_AIHTH,
          upperThreshold >> 8);
-  disable();
+  //disable();
 }
 
 /************************************************************************/
@@ -397,9 +420,9 @@ void Adafruit_TSL2591::clearInterrupt() {
     }
   }
 
-  enable();
+  //enable();
   write8(TSL2591_CLEAR_INT);
-  disable();
+  //disable();
 }
 
 /************************************************************************/
@@ -417,10 +440,10 @@ uint8_t Adafruit_TSL2591::getStatus(void) {
   }
 
   // Enable the device
-  enable();
+  //enable();
   uint8_t x;
   x = read8(TSL2591_COMMAND_BIT | TSL2591_REGISTER_DEVICE_STATUS);
-  disable();
+  //disable();
   return x;
 }
 
